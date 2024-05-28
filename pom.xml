@@ -1328,6 +1328,18 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>jdk17plus</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <properties>
+        <!-- Build Properties -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven-shade-plugin.version>3.5.3</maven-shade-plugin.version>
+      </properties>
+    </profile>
 
     <profile>
       <activation>
