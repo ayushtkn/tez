@@ -271,6 +271,12 @@ ENV PROTOBUF_HOME /opt/protobuf
 ENV PROTOC_PATH /opt/protobuf/bin/protoc
 ENV PATH "${PATH}:/opt/protobuf/bin"
 
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jdk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
 ####
 # YETUS CUT HERE
 # Magic text above! Everything from here on is ignored
