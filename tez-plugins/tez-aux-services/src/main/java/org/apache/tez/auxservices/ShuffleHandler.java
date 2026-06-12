@@ -1037,6 +1037,30 @@ public class ShuffleHandler extends AuxiliaryService {
             "\n  dagId: " + dagIdQ +
             "\n  keepAlive: " + keepAliveParam);
       }
+      // Authenticate delete requests before execution
+      boolean isDeleteRequest = notEmptyAndContains(dagCompletedQ, "delete")
+          || notEmptyAndContains(vertexCompletedQ, "delete")
+          || notEmptyAndContains(taskAttemptFailedQ, "delete");
+      if (isDeleteRequest) {
+        if (jobQ == null || jobQ.isEmpty()) {
+          sendError(ctx, "Missing job parameter for delete request", BAD_REQUEST);
+          return;
+        }
+        final String deleteReqUri = request.getUri();
+        if (deleteReqUri == null) {
+          sendError(ctx, FORBIDDEN);
+          return;
+        }
+        HttpResponse deleteResponse = new DefaultHttpResponse(HTTP_1_1, OK);
+        try {
+          verifyRequest(jobQ.get(0), ctx, request, deleteResponse,
+              new URL("http", "", this.port, deleteReqUri));
+        } catch (IOException e) {
+          LOG.warn("Shuffle delete request authentication failure ", e);
+          sendError(ctx, e.getMessage(), UNAUTHORIZED);
+          return;
+        }
+      }
       // If the request is for Dag Deletion, process the request and send OK.
       if (deleteDagDirectories(ctx.channel(), dagCompletedQ, jobQ, dagIdQ))  {
         return;
